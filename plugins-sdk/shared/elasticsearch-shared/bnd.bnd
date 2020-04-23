@@ -1,0 +1,13 @@
+Bundle-Name: Liferay Portal Elasticsearch Adapter
+Bundle-SymbolicName: com.liferay.portal.search.elasticsearch
+Bundle-Version: 1.0.0
+libs: ${filterout;${lsr;lib;*.jar};.*.jar}
+Import-Package:\
+	com.liferay.portal.kernel.log.*,\
+	com.liferay.portal.kernel.search.*,\
+	com.liferay.portal.model.*,\
+	com.liferay.portal.service.*,\
+	*;resolution:="optional"
+Include-Resource:\
+	${replace;${libs};^;@lib/},\
+	classes

@@ -1,0 +1,29 @@
+<?xml version="1.0"?>
+<!DOCTYPE hook PUBLIC "-//Liferay//DTD Hook 6.2.0//EN" "http://www.liferay.com/dtd/liferay-hook_6_2_0.dtd">
+
+<hook>
+	<indexer-post-processor>
+		<indexer-class-name>com.liferay.portlet.blogs.model.BlogsEntry</indexer-class-name>
+		<indexer-post-processor-impl>com.liferay.portal.search.elasticsearch.hook.indexer.ElasticSearchIndexerPostProcessor</indexer-post-processor-impl>
+	</indexer-post-processor>
+	<indexer-post-processor>
+		<indexer-class-name>com.liferay.portlet.documentlibrary.model.DLFileEntry</indexer-class-name>
+		<indexer-post-processor-impl>com.liferay.portal.search.elasticsearch.hook.indexer.ElasticSearchIndexerPostProcessor</indexer-post-processor-impl>
+	</indexer-post-processor>
+	<indexer-post-processor>
+		<indexer-class-name>com.liferay.portlet.documentlibrary.model.DLFolder</indexer-class-name>
+		<indexer-post-processor-impl>com.liferay.portal.search.elasticsearch.hook.indexer.ElasticSearchIndexerPostProcessor</indexer-post-processor-impl>
+	</indexer-post-processor>
+	<indexer-post-processor>
+		<indexer-class-name>com.liferay.portlet.journal.model.JournalArticle</indexer-class-name>
+		<indexer-post-processor-impl>com.liferay.portal.search.elasticsearch.hook.indexer.ElasticSearchIndexerPostProcessor</indexer-post-processor-impl>
+	</indexer-post-processor>
+	<struts-action>
+		<struts-action-path>/admin/edit_server</struts-action-path>
+		<struts-action-impl>com.liferay.portal.search.elasticsearch.hook.action.ElasticsearchEditServerAction</struts-action-impl>
+	</struts-action>
+	<struts-action>
+		<struts-action-path>/admin_server/edit_server</struts-action-path>
+		<struts-action-impl>com.liferay.portal.search.elasticsearch.hook.action.ElasticsearchEditServerAction</struts-action-impl>
+	</struts-action>
+</hook>

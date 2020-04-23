@@ -1,0 +1,139 @@
+<?xml version="1.0"?>
+
+<beans
+	default-destroy-method="destroy"
+	default-init-method="afterPropertiesSet"
+	xmlns="http://www.springframework.org/schema/beans"
+	xmlns:util="http://www.springframework.org/schema/util"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-3.0.xsd"
+>
+	<bean class="com.liferay.portal.spring.context.PortletBeanFactoryPostProcessor" />
+
+	<!-- Elasticsearch engine adapter -->
+
+	<bean class="com.liferay.portal.search.elasticsearch.util.SearchContextUtil">
+		<property name="commitImmediately" value="#{T(com.liferay.util.portlet.PortletProps).get('elasticsearch.commit.immediately')}" />
+	</bean>
+
+	<bean class="com.liferay.portal.search.elasticsearch.ElasticsearchIndexSearcher" id="com.liferay.portal.search.elasticsearch.ElasticsearchIndexSearcher">
+		<property name="elasticsearchConnectionManager" ref="com.liferay.portal.search.elasticsearch.connection.ElasticsearchConnectionManager" />
+		<property name="facetProcessor" ref="com.liferay.portal.search.elasticsearch.facet.CompositeFacetProcessor" />
+		<property name="querySuggester">
+			<bean class="com.liferay.portal.search.elasticsearch.ElasticsearchQuerySuggester">
+				<property name="elasticsearchConnectionManager" ref="com.liferay.portal.search.elasticsearch.connection.ElasticsearchConnectionManager" />
+			</bean>
+		</property>
+	</bean>
+	<bean class="com.liferay.portal.search.elasticsearch.ElasticsearchIndexWriter" id="com.liferay.portal.search.elasticsearch.ElasticsearchIndexWriter">
+		<property name="elasticsearchConnectionManager" ref="com.liferay.portal.search.elasticsearch.connection.ElasticsearchConnectionManager" />
+		<property name="elasticsearchUpdateDocumentCommand" ref="com.liferay.portal.search.elasticsearch.ElasticsearchUpdateDocumentCommand" />
+		<property name="spellCheckIndexWriter" ref="com.liferay.portal.search.elasticsearch.ElasticsearchSpellCheckIndexWriter" />
+	</bean>
+	<bean class="com.liferay.portal.search.elasticsearch.ElasticsearchSearchEngine" id="com.liferay.portal.search.elasticsearch.ElasticsearchEngineImpl">
+		<property name="clusteredWrite" value="false" />
+		<property name="elasticsearchConnectionManager" ref="com.liferay.portal.search.elasticsearch.connection.ElasticsearchConnectionManager" />
+		<property name="indexFactory" ref="com.liferay.portal.search.elasticsearch.index.IndexFactory" />
+		<property name="indexSearcher" ref="com.liferay.portal.search.elasticsearch.ElasticsearchIndexSearcher" />
+		<property name="indexWriter" ref="com.liferay.portal.search.elasticsearch.ElasticsearchIndexWriter" />
+		<property name="vendor" value="Elasticsearch" />
+	</bean>
+	<bean class="com.liferay.portal.search.elasticsearch.ElasticsearchSearchEngineUtil" id="com.liferay.portal.search.elasticsearch.ElasticSearchEngineUtil">
+		<property name="elasticsearchSearchEngine" ref="com.liferay.portal.search.elasticsearch.ElasticsearchEngineImpl" />
+	</bean>
+	<bean class="com.liferay.portal.search.elasticsearch.ElasticsearchSpellCheckIndexWriter" id="com.liferay.portal.search.elasticsearch.ElasticsearchSpellCheckIndexWriter">
+		<property name="elasticsearchConnectionManager" ref="com.liferay.portal.search.elasticsearch.connection.ElasticsearchConnectionManager" />
+		<property name="elasticsearchUpdateDocumentCommand" ref="com.liferay.portal.search.elasticsearch.ElasticsearchUpdateDocumentCommand" />
+	</bean>
+	<bean class="com.liferay.portal.search.elasticsearch.ElasticsearchUpdateDocumentCommandImpl" id="com.liferay.portal.search.elasticsearch.ElasticsearchUpdateDocumentCommand">
+		<property name="elasticsearchConnectionManager" ref="com.liferay.portal.search.elasticsearch.connection.ElasticsearchConnectionManager" />
+		<property name="elasticsearchDocumentFactory" ref="com.liferay.portal.search.elasticsearch.document.ElasticsearchDocumentFactory" />
+	</bean>
+
+	<!-- Elasticsearch analysis -->
+
+	<bean class="com.liferay.portal.search.elasticsearch.analysis.FieldQueryBuilderFactoryImpl" id="com.liferay.portal.search.elasticsearch.analysis.FieldQueryBuilderFactory" init-method="afterPropertiesSet">
+		<property name="descriptionQueryBuilder" ref="com.liferay.portal.search.elasticsearch.analysis.DescriptionFieldQueryBuilder" />
+		<property name="substringQueryBuilder" ref="com.liferay.portal.search.elasticsearch.analysis.SubstringFieldQueryBuilder" />
+		<property name="titleQueryBuilder" ref="com.liferay.portal.search.elasticsearch.analysis.TitleFieldQueryBuilder" />
+	</bean>
+	<bean class="com.liferay.portal.search.elasticsearch.analysis.FieldQueryFactoryImpl" id="com.liferay.portal.search.elasticsearch.analysis.FieldQueryFactory">
+		<property name="fieldQueryBuilderFactories">
+			<util:map>
+				<entry key="fieldQueryBuilderFactory" value-ref="com.liferay.portal.search.elasticsearch.analysis.FieldQueryBuilderFactory" />
+			</util:map>
+		</property>
+		<property name="titleQueryBuilder" ref="com.liferay.portal.search.elasticsearch.analysis.TitleFieldQueryBuilder" />
+	</bean>
+	<bean class="com.liferay.portal.search.elasticsearch.analysis.FieldQueryFactoryUtil" id="com.liferay.portal.search.elasticsearch.analysis.FieldQueryFactoryUtil">
+		<property name="fieldQueryFactory" ref="com.liferay.portal.search.elasticsearch.analysis.FieldQueryFactory" />
+	</bean>
+	<bean class="com.liferay.portal.search.elasticsearch.analysis.SimpleKeywordTokenizer" id="com.liferay.portal.search.elasticsearch.analysis.KeywordTokenizer" />
+	<bean class="com.liferay.portal.search.elasticsearch.analysis.DescriptionFieldQueryBuilder" id="com.liferay.portal.search.elasticsearch.analysis.DescriptionFieldQueryBuilder" init-method="afterPropertiesSet">
+		<property name="keywordTokenizer" ref="com.liferay.portal.search.elasticsearch.analysis.KeywordTokenizer" />
+	</bean>
+	<bean class="com.liferay.portal.search.elasticsearch.analysis.SubstringFieldQueryBuilder" id="com.liferay.portal.search.elasticsearch.analysis.SubstringFieldQueryBuilder">
+		<property name="keywordTokenizer" ref="com.liferay.portal.search.elasticsearch.analysis.KeywordTokenizer" />
+	</bean>
+	<bean class="com.liferay.portal.search.elasticsearch.analysis.TitleFieldQueryBuilder" id="com.liferay.portal.search.elasticsearch.analysis.TitleFieldQueryBuilder" init-method="afterPropertiesSet">
+		<property name="keywordTokenizer" ref="com.liferay.portal.search.elasticsearch.analysis.KeywordTokenizer" />
+	</bean>
+
+	<!-- Elasticsearch connection -->
+
+	<bean class="com.liferay.portal.search.elasticsearch.connection.RemoteElasticsearchConnection" id="com.liferay.portal.search.elasticsearch.connection.ElasticsearchConnection">
+		<property name="clusterName" value="#{T(com.liferay.util.portlet.PortletProps).get('elasticsearch.cluster.name')}" />
+		<property name="configFileName" value="/META-INF/elasticsearch-remote.yml" />
+		<property name="indexFactory" ref="com.liferay.portal.search.elasticsearch.index.IndexFactory" />
+		<property name="transportAddresses" value="#{T(com.liferay.util.portlet.PortletProps).get('elasticsearch.transport.addresses')}" />
+	</bean>
+	<bean class="com.liferay.portal.search.elasticsearch.connection.ElasticsearchConnectionManager" id="com.liferay.portal.search.elasticsearch.connection.ElasticsearchConnectionManager" init-method="afterPropertiesSet">
+		<property name="elasticsearchConnection" ref="com.liferay.portal.search.elasticsearch.connection.ElasticsearchConnection" />
+	</bean>
+	<bean class="com.liferay.portal.search.elasticsearch.index.CompanyIndexFactory" id="com.liferay.portal.search.elasticsearch.index.IndexFactory">
+		<property name="indexConfigFileName" value="/META-INF/index-settings.json" />
+		<property name="typeMappings">
+			<map>
+				<entry key="_default_" value="/META-INF/mappings/default-type-mappings.json" />
+				<entry key="KeywordQueryDocumentType" value="/META-INF/mappings/keyword-query-type-mappings.json" />
+				<entry key="LiferayDocumentType" value="/META-INF/mappings/liferay-type-mappings.json" />
+				<entry key="SpellCheckDocumentType" value="/META-INF/mappings/spellcheck-type-mappings.json" />
+			</map>
+		</property>
+	</bean>
+
+	<!-- Elasticsearch document -->
+
+	<bean class="com.liferay.portal.search.elasticsearch.document.DefaultElasticsearchDocumentFactory" id="com.liferay.portal.search.elasticsearch.document.ElasticsearchDocumentFactory" />
+
+	<!-- Elasticsearch facet -->
+
+	<bean class="com.liferay.portal.search.elasticsearch.facet.DefaultFacetProcessor" id="com.liferay.portal.search.elasticsearch.facet.DefaultFacetProcessor" />
+	<bean class="com.liferay.portal.search.elasticsearch.facet.RangeFacetProcessor" id="com.liferay.portal.search.elasticsearch.facet.RangeFacetProcessor" />
+	<bean class="com.liferay.portal.search.elasticsearch.facet.CompositeFacetProcessor" id="com.liferay.portal.search.elasticsearch.facet.CompositeFacetProcessor">
+		<property name="defaultFacetProcessor" ref="com.liferay.portal.search.elasticsearch.facet.DefaultFacetProcessor" />
+		<property name="facetProcessors">
+			<map>
+				<entry key="com.liferay.portal.kernel.search.facet.ModifiedFacet" value-ref="com.liferay.portal.search.elasticsearch.facet.RangeFacetProcessor" />
+				<entry key="com.liferay.portal.kernel.search.facet.RangeFacet" value-ref="com.liferay.portal.search.elasticsearch.facet.RangeFacetProcessor" />
+			</map>
+		</property>
+	</bean>
+
+	<!--Elasticsearch settings-->
+
+	<bean class="com.liferay.portal.search.elasticsearch.util.ElasticsearchSettings" id="com.liferay.portal.search.elasticsearch.util.ElasticsearchSettings">
+		<property name="indexPrefix" value="#{T(com.liferay.util.portlet.PortletProps).get('elasticsearch.index.prefix')}" />
+	</bean>
+
+	<!-- Configurator -->
+
+	<bean id="searchEngineConfigurator.solr" class="com.liferay.portal.search.elasticsearch.ElasticsearchEngineConfigurator">
+		<property name="elasticsearchConnectionManager" ref="com.liferay.portal.search.elasticsearch.connection.ElasticsearchConnectionManager" />
+		<property name="searchEngines">
+			<util:map>
+				<entry key="#{T(com.liferay.util.portlet.PortletProps).get('elasticsearch.search.engine')}" value-ref="com.liferay.portal.search.elasticsearch.ElasticsearchEngineImpl" />
+			</util:map>
+		</property>
+	</bean>
+</beans>
