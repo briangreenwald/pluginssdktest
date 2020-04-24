@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <!DOCTYPE project>
 
-<project basedir="." default="deploy" name="layouttpl" xmlns:antelope="antlib:ise.antelope.tasks">
+<project name="layouttpl" basedir="." default="deploy" xmlns:antelope="antlib:ise.antelope.tasks">
 	<import file="../build-common-plugins.xml" />
 
 	<target name="create">
@@ -35,7 +35,7 @@
 			/>
 		</copy>
 
-		<antelope:stringutil property="layouttpl.template.name" string="${layouttpl.name}">
+		<antelope:stringutil string="${layouttpl.name}" property="layouttpl.template.name">
 			<replace regex="-" replacement="_" />
 		</antelope:stringutil>
 
@@ -55,5 +55,12 @@
 			file="${layouttpl.dir}/docroot/blank_columns.tpl"
 			tofile="${layouttpl.dir}/docroot/${layouttpl.template.name}.tpl"
 		/>
+
+		<move
+			file="${layouttpl.dir}/docroot/blank_columns.wap.tpl"
+			tofile="${layouttpl.dir}/docroot/${layouttpl.template.name}.wap.tpl"
+		/>
+
+		<touch file="${layouttpl.dir}/docroot/${layouttpl.template.name}.wap.tpl" />
 	</target>
 </project>

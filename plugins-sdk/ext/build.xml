@@ -1,18 +1,8 @@
 <?xml version="1.0"?>
 <!DOCTYPE project>
 
-<project basedir="." default="deploy" name="ext" xmlns:antelope="antlib:ise.antelope.tasks">
+<project name="ext" basedir="." default="deploy">
 	<import file="../build-common-plugins.xml" />
-
-	<target name="clean">
-		<antcall target="loop-exts">
-			<param name="loop.exts.cmd" value="clean-ext" />
-		</antcall>
-	</target>
-
-	<target name="clean-ext">
-		<ant dir="${ext.name}" inheritAll="false" target="clean" />
-	</target>
 
 	<target name="create">
 		<if>
@@ -41,9 +31,9 @@
 		</copy>
 
 		<mkdir dir="${ext.plugin.dir}/docroot/WEB-INF/ext-impl/src" />
-		<mkdir dir="${ext.plugin.dir}/docroot/WEB-INF/ext-kernel/src" />
 		<mkdir dir="${ext.plugin.dir}/docroot/WEB-INF/ext-lib/global" />
 		<mkdir dir="${ext.plugin.dir}/docroot/WEB-INF/ext-lib/portal" />
+		<mkdir dir="${ext.plugin.dir}/docroot/WEB-INF/ext-service/src" />
 		<mkdir dir="${ext.plugin.dir}/docroot/WEB-INF/ext-util-bridges/src" />
 		<mkdir dir="${ext.plugin.dir}/docroot/WEB-INF/ext-util-java/src" />
 		<mkdir dir="${ext.plugin.dir}/docroot/WEB-INF/ext-util-taglib/src" />
@@ -53,40 +43,6 @@
 			<replacefilter token="@ext.name@" value="${ext.name}" />
 			<replacefilter token="@plugin.type.dir@" value="${plugin.type.dir}" />
 		</replace>
-	</target>
-
-	<target name="deploy">
-		<antcall target="loop-exts">
-			<param name="loop.exts.cmd" value="deploy-ext" />
-		</antcall>
-	</target>
-
-	<target name="deploy-ext">
-		<ant dir="${ext.name}" inheritAll="false" target="deploy" />
-	</target>
-
-	<target name="loop-exts">
-		<if>
-			<not>
-				<equals arg1="${plugins.includes}" arg2="" />
-			</not>
-			<then>
-				<for param="ext.name">
-					<path>
-						<dirset dir="." excludes="${plugins.excludes}" includes="${plugins.includes}" />
-					</path>
-					<sequential>
-						<antelope:stringutil property="ext.name.unix" string="@{ext.name}">
-							<antelope:replace regex="\\" replacement="/" />
-						</antelope:stringutil>
-
-						<antelope:grep group="2" in="${ext.name.unix}" property="ext.name" regex="(.*/)(.*)" />
-
-						<antcall target="${loop.exts.cmd}" />
-					</sequential>
-				</for>
-			</then>
-		</if>
 	</target>
 
 	<target name="upgrade-ext">
@@ -124,23 +80,23 @@ exist.
 			<param name="ext.name" value="${ext.name}" />
 		</antcall>
 
-		<copy failonerror="false" todir="${ext.name}-ext/docroot/WEB-INF/ext-impl/src">
+		<copy todir="${ext.name}-ext/docroot/WEB-INF/ext-impl/src" failonerror="false">
 			<fileset dir="${ext.dir}/ext-impl/src" />
 		</copy>
 
-		<copy failonerror="false" todir="${ext.name}-ext/docroot/WEB-INF/ext-lib/global">
+		<copy todir="${ext.name}-ext/docroot/WEB-INF/ext-lib/global" failonerror="false">
 			<fileset dir="${ext.dir}/ext-lib/global" />
 		</copy>
 
-		<copy failonerror="false" todir="${ext.name}-ext/docroot/WEB-INF/ext-lib/portal">
+		<copy todir="${ext.name}-ext/docroot/WEB-INF/ext-lib/portal" failonerror="false">
 			<fileset dir="${ext.dir}/ext-lib/portal" />
 		</copy>
 
-		<copy failonerror="false" todir="${ext.name}-ext/docroot/WEB-INF/ext-kernel/src">
-			<fileset dir="${ext.dir}/ext-kernel/src" />
+		<copy todir="${ext.name}-ext/docroot/WEB-INF/ext-service/src" failonerror="false">
+			<fileset dir="${ext.dir}/ext-service/src" />
 		</copy>
 
-		<copy failonerror="false" overwrite="true" todir="${ext.name}-ext/docroot/WEB-INF/ext-web/docroot">
+		<copy todir="${ext.name}-ext/docroot/WEB-INF/ext-web/docroot" failonerror="false" overwrite="true">
 			<fileset
 				dir="${ext.dir}/ext-web/docroot"
 				excludes="**/struts-config.xml,**/tiles-defs.xml"
@@ -157,7 +113,7 @@ exist.
 			tofile="${ext.name}-ext/docroot/WEB-INF/ext-web/docroot/WEB-INF/tiles-defs-ext.xml"
 		/>
 
-		<copy failonerror="false" todir="${ext.name}-ext/docroot/WEB-INF/sql">
+		<copy todir="${ext.name}-ext/docroot/WEB-INF/sql" failonerror="false">
 			<fileset dir="${ext.dir}/sql" />
 		</copy>
 	</target>
