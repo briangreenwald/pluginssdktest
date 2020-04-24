@@ -3,6 +3,7 @@
 
 <project name="build-common-plugins" xmlns:antelope="antlib:ise.antelope.tasks">
 	<import file="build-common.xml" />
+	<import file="build-common-plugins-inspector.xml" />
 
 	<path id="plugins.includes.path">
 		<dirset dir="." excludes="${plugins.excludes}" includes="${plugins.includes}" />
@@ -29,27 +30,27 @@
 				/>
 			</path>
 			<sequential>
-				<antelope:stringutil property="service.file.index" string="@{service.file}">
-					<antelope:indexof fromindex="0" string="docroot" />
+				<antelope:stringutil string="@{service.file}" property="service.file.index">
+					<antelope:indexof string="docroot" fromindex="0" />
 				</antelope:stringutil>
 
 				<if>
 					<equals arg1="${service.file.index}" arg2="-1" />
 					<then>
-						<antelope:stringutil property="service.file.index" string="@{service.file}">
-							<antelope:indexof fromindex="0" string="service.xml" />
+						<antelope:stringutil string="@{service.file}" property="service.file.index">
+							<antelope:indexof string="service.xml" fromindex="0" />
 						</antelope:stringutil>
 					</then>
 				</if>
 
-				<antelope:stringutil property="portlet.dir" string="@{service.file}">
+				<antelope:stringutil string="@{service.file}" property="portlet.dir">
 					<antelope:substring beginindex="0" endindex="${service.file.index}" />
 				</antelope:stringutil>
 
 				<if>
 					<available file="${portlet.dir}/build.xml" />
 					<then>
-						<ant dir="${portlet.dir}" inheritAll="false" target="build-service" />
+						<ant dir="${portlet.dir}" target="build-service" inheritAll="false" />
 					</then>
 				</if>
 			</sequential>

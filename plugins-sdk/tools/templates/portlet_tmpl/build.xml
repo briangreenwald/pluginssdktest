@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <!DOCTYPE project>
 
-<project basedir="." default="deploy" name="@portlet.name@-portlet">
+<project name="@portlet.name@-portlet" basedir="." default="deploy">
 	<import file="@plugin.type.dir@/build-common-portlet.xml" />
 </project>

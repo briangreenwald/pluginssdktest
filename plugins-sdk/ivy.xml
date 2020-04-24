@@ -26,10 +26,11 @@
 		<dependency name="antelopetasks" org="org.tigris.antelope" rev="3.2.10" />
 		<dependency name="bcpg-jdk16" org="org.bouncycastle" rev="1.46" />
 		<dependency name="bcprov-jdk16" org="org.bouncycastle" rev="1.46" />
-		<dependency name="bsf" org="bsf" rev="2.4.0" />
 		<dependency name="bsh" org="org.beanshell" rev="2.0b4" />
+		<dependency name="bsf" org="bsf" rev="2.4.0" />
 		<dependency name="ccpp" org="javax.ccpp" rev="1.0" />
 		<dependency name="commons-logging" org="commons-logging" rev="1.1.1" />
+		<dependency name="ecj" org="org.eclipse.jdt.core.compiler" rev="3.7.2" />
 		<dependency name="error_prone_ant" org="com.google.errorprone" rev="1.0.8" />
 		<dependency name="jalopy" org="jalopy" rev="1.5rc3" />
 		<dependency name="javax.servlet-api" org="javax.servlet" rev="3.0.1" />
@@ -37,6 +38,8 @@
 		<dependency name="log4j" org="log4j" rev="1.2.16" />
 		<dependency name="mail" org="javax.mail" rev="1.4" />
 		<dependency name="net.sf.jargs" org="com.liferay" rev="1.0" />
+		<dependency name="org.osgi.compendium" org="org.osgi" rev="5.0.0" />
+		<dependency name="org.osgi.core" org="org.osgi" rev="5.0.0" />
 		<dependency name="qdox" org="com.thoughtworks.qdox" rev="1.12.1" />
 		<dependency name="serializer" org="xalan" rev="2.7.1" />
 		<dependency name="xalan" org="xalan" rev="2.7.1" />
@@ -50,6 +53,6 @@
 		<dependency conf="test->default" name="powermock-module-junit4" org="org.powermock" rev="1.6.1" />
 		<dependency conf="test->default" name="powermock-module-junit4-common" org="org.powermock" rev="1.6.1" />
 		<dependency conf="test->default" name="powermock-reflect" org="org.powermock" rev="1.6.1" />
-		<dependency conf="test->default" name="spring-test" org="org.springframework" rev="3.2.10.RELEASE" />
+		<dependency conf="test->default" name="spring-test" org="org.springframework" rev="3.0.7.RELEASE" />
 	</dependencies>
 </ivy-module>

@@ -48,8 +48,9 @@ a portlet plugin.
 			<arg value="service.orm.file=${basedir}/docroot/WEB-INF/ext-impl/src/META-INF/ext-orm.xml" />
 			<arg value="service.model.hints.file=${basedir}/docroot/WEB-INF/ext-impl/src/META-INF/ext-model-hints.xml" />
 			<arg value="service.spring.file=${basedir}/docroot/WEB-INF/ext-impl/src/META-INF/ext-spring.xml" />
-			<arg value="service.api.dir=${basedir}/docroot/WEB-INF/ext-kernel/src" />
+			<arg value="service.api.dir=${basedir}/docroot/WEB-INF/ext-service/src" />
 			<arg value="service.impl.dir=${basedir}/docroot/WEB-INF/ext-impl/src" />
+			<arg value="service.remoting.file=${basedir}/docroot/WEB-INF/ext-web/docroot/WEB-INF/remoting-servlet-ext.xml" />
 			<arg value="service.sql.dir=${basedir}/docroot/WEB-INF/sql" />
 			<arg value="service.sql.file=portal-tables.sql" />
 			<arg value="service.sql.indexes.file=indexes.sql" />
@@ -111,31 +112,31 @@ then "app.server.dir" should point to
 
 		<delete dir="${app.server.dir}" />
 
-		<unzip dest="${ext.work.dir}" src="${app.server.zip.name}" />
+		<unzip src="${app.server.zip.name}" dest="${ext.work.dir}" />
 	</target>
 
 	<target name="compile">
 		<antcall target="compile-with-global-class-loader">
-			<param name="module.name" value="kernel" />
+			<param name="module.name" value="service" />
 		</antcall>
 
 		<antcall target="compile-with-portal-class-loader">
-			<param name="module.class.path" value="docroot/WEB-INF/ext-kernel/classes" />
+			<param name="module.class.path" value="docroot/WEB-INF/ext-service/classes" />
 			<param name="module.name" value="util-bridges" />
 		</antcall>
 
 		<antcall target="compile-with-portal-class-loader">
-			<param name="module.class.path" value="docroot/WEB-INF/ext-kernel/classes;docroot/WEB-INF/ext-util-bridges/classes" />
+			<param name="module.class.path" value="docroot/WEB-INF/ext-service/classes;docroot/WEB-INF/ext-util-bridges/classes" />
 			<param name="module.name" value="util-java" />
 		</antcall>
 
 		<antcall target="compile-with-portal-class-loader">
-			<param name="module.class.path" value="docroot/WEB-INF/ext-kernel/classes;docroot/WEB-INF/ext-util-bridges/classes;docroot/WEB-INF/ext-util-java/classes" />
+			<param name="module.class.path" value="docroot/WEB-INF/ext-service/classes;docroot/WEB-INF/ext-util-bridges/classes;docroot/WEB-INF/ext-util-java/classes" />
 			<param name="module.name" value="util-taglib" />
 		</antcall>
 
 		<antcall target="compile-with-portal-class-loader">
-			<param name="module.class.path" value="docroot/WEB-INF/ext-kernel/classes;docroot/WEB-INF/ext-util-bridges/classes;docroot/WEB-INF/ext-util-java/classes;docroot/WEB-INF/ext-util-taglib/classes" />
+			<param name="module.class.path" value="docroot/WEB-INF/ext-service/classes;docroot/WEB-INF/ext-util-bridges/classes;docroot/WEB-INF/ext-util-java/classes;docroot/WEB-INF/ext-util-taglib/classes" />
 			<param name="module.name" value="impl" />
 		</antcall>
 
@@ -146,13 +147,13 @@ then "app.server.dir" should point to
 		<if>
 			<available file="docroot/WEB-INF/ext-web/docroot/WEB-INF/lib" />
 			<then>
-				<fail>
+						<fail>
 .
 
 "docroot\WEB-INF\ext-web\docroot\WEB-INF\lib" must not exist. Put JAR files in
 "docroot\WEB-INF\ext-lib\portal" that need to be accessible to the portal class
 loader.
-				</fail>
+						</fail>
 			</then>
 		</if>
 	</target>
@@ -198,106 +199,55 @@ loader.
 		/>
 	</target>
 
-	<target depends="war" name="deploy">
-		<copy file="${plugin.file}" todir="${auto.deploy.dir}" />
-	</target>
-
 	<target name="deploy-properties">
-		<copy overwrite="true" todir="${app.server.classes.portal.dir}">
+		<copy todir="${app.server.classes.portal.dir}" overwrite="true">
 			<fileset dir="docroot/WEB-INF/ext-impl/src" includes="portal-*.properties,system-*.properties" />
 		</copy>
 	</target>
 
-	<target depends="war" name="direct-deploy">
-		<if>
-			<or>
-				<equals arg1="${app.server.type}" arg2="tcserver" />
-				<equals arg1="${app.server.type}" arg2="tomcat" />
-			</or>
-			<then>
-				<copy overwrite="true" todir="${app.server.dir}/lib/ext/global">
-					<fileset dir="docroot/WEB-INF/ext-lib/global" includes="*.jar" />
-				</copy>
+	<target name="direct-deploy" depends="war">
+		<copy todir="${app.server.lib.global.dir}" overwrite="true">
+			<fileset dir="docroot/WEB-INF/ext-lib/global" includes="*.jar" />
+		</copy>
 
-				<copy
-					file="docroot/WEB-INF/ext-kernel/ext-kernel.jar"
-					overwrite="true"
-					tofile="${app.server.dir}/lib/ext/global/ext-${plugin.name}-kernel.jar"
-				/>
+		<copy
+			file="docroot/WEB-INF/ext-service/ext-service.jar"
+			tofile="${app.server.lib.global.dir}/ext-${plugin.name}-service.jar"
+			overwrite="true"
+		/>
 
-				<copy overwrite="true" todir="${app.server.dir}/lib/ext/portal">
-					<fileset dir="docroot/WEB-INF/ext-lib/portal" includes="*.jar" />
-				</copy>
+		<copy todir="${app.server.lib.portal.dir}" overwrite="true">
+			<fileset dir="docroot/WEB-INF/ext-lib/portal" includes="*.jar" />
+		</copy>
 
-				<copy
-					file="docroot/WEB-INF/ext-impl/ext-impl.jar"
-					overwrite="true"
-					tofile="${app.server.dir}/lib/ext/portal/ext-${plugin.name}-impl.jar"
-				/>
+		<copy
+			file="docroot/WEB-INF/ext-impl/ext-impl.jar"
+			tofile="${app.server.lib.portal.dir}/ext-${plugin.name}-impl.jar"
+			overwrite="true"
+		/>
 
-				<copy
-					file="docroot/WEB-INF/ext-util-bridges/ext-util-bridges.jar"
-					overwrite="true"
-					tofile="${app.server.dir}/lib/ext/portal/ext-${plugin.name}-util-bridges.jar"
-				/>
+		<copy
+			file="docroot/WEB-INF/ext-util-bridges/ext-util-bridges.jar"
+			tofile="${app.server.lib.portal.dir}/ext-${plugin.name}-util-bridges.jar"
+			overwrite="true"
+		/>
 
-				<copy
-					file="docroot/WEB-INF/ext-util-java/ext-util-java.jar"
-					overwrite="true"
-					tofile="${app.server.dir}/lib/ext/portal/ext-${plugin.name}-util-java.jar"
-				/>
+		<copy
+			file="docroot/WEB-INF/ext-util-java/ext-util-java.jar"
+			tofile="${app.server.lib.portal.dir}/ext-${plugin.name}-util-java.jar"
+			overwrite="true"
+		/>
 
-				<copy
-					file="docroot/WEB-INF/ext-util-taglib/ext-util-taglib.jar"
-					overwrite="true"
-					tofile="${app.server.dir}/lib/ext/portal/ext-${plugin.name}-util-taglib.jar"
-				/>
-			</then>
-			<else>
-				<copy overwrite="true" todir="${app.server.lib.global.dir}">
-					<fileset dir="docroot/WEB-INF/ext-lib/global" includes="*.jar" />
-				</copy>
-
-				<copy
-					file="docroot/WEB-INF/ext-kernel/ext-kernel.jar"
-					overwrite="true"
-					tofile="${app.server.lib.global.dir}/ext-${plugin.name}-kernel.jar"
-				/>
-
-				<copy overwrite="true" todir="${app.server.lib.portal.dir}">
-					<fileset dir="docroot/WEB-INF/ext-lib/portal" includes="*.jar" />
-				</copy>
-
-				<copy
-					file="docroot/WEB-INF/ext-impl/ext-impl.jar"
-					overwrite="true"
-					tofile="${app.server.lib.portal.dir}/ext-${plugin.name}-impl.jar"
-				/>
-
-				<copy
-					file="docroot/WEB-INF/ext-util-bridges/ext-util-bridges.jar"
-					overwrite="true"
-					tofile="${app.server.lib.portal.dir}/ext-${plugin.name}-util-bridges.jar"
-				/>
-
-				<copy
-					file="docroot/WEB-INF/ext-util-java/ext-util-java.jar"
-					overwrite="true"
-					tofile="${app.server.lib.portal.dir}/ext-${plugin.name}-util-java.jar"
-				/>
-
-				<copy
-					file="docroot/WEB-INF/ext-util-taglib/ext-util-taglib.jar"
-					overwrite="true"
-					tofile="${app.server.lib.portal.dir}/ext-${plugin.name}-util-taglib.jar"
-				/>
-			</else>
-		</if>
+		<copy
+			file="docroot/WEB-INF/ext-util-taglib/ext-util-taglib.jar"
+			tofile="${app.server.lib.portal.dir}/ext-${plugin.name}-util-taglib.jar"
+			overwrite="true"
+		/>
 
 		<if>
 			<available file="docroot/WEB-INF/ext-web/docroot" />
 			<then>
-				<copy overwrite="true" todir="${app.server.portal.dir}">
+				<copy todir="${app.server.portal.dir}" overwrite="true">
 					<fileset dir="docroot/WEB-INF/ext-web/docroot" excludes="WEB-INF/web.xml" />
 				</copy>
 			</then>
@@ -322,7 +272,7 @@ loader.
 			</then>
 		</if>
 
-		<unzip dest="${app.server.portal.dir}" src="${plugin.file}">
+		<unzip src="${plugin.file}" dest="${app.server.portal.dir}">
 			<patternset>
 				<include name="WEB-INF/ext-${plugin.name}.xml" />
 			</patternset>
@@ -331,10 +281,10 @@ loader.
 		<antcall target="deploy-properties" />
 	</target>
 
-	<target depends="compile" name="war">
+	<target name="war" depends="compile">
 		<jar
-			basedir="docroot/WEB-INF/ext-kernel/classes"
-			destfile="docroot/WEB-INF/ext-kernel/ext-kernel.jar"
+			basedir="docroot/WEB-INF/ext-service/classes"
+			destfile="docroot/WEB-INF/ext-service/ext-service.jar"
 		/>
 
 		<antcall target="war-util">
