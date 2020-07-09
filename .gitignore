@@ -21,5 +21,4 @@
 /plugins-sdk/build.*.properties
 /plugins-sdk/dependencies/**/*.jar
 /plugins-sdk/dist
-/plugins-sdk/lib
 test-results
